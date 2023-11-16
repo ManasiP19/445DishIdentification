@@ -1,0 +1,14 @@
+Manasi
+    GoogleNet
+    PyTorch
+
+Tanvi 
+    SVM 
+
+Laura 
+    Frontend: Django
+        Upload and Recieve Image
+        Connect recipe API
+        Display suggest recipe 
+        **Make it pretty** 
+        
