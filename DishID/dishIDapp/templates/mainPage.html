@@ -1,0 +1,16 @@
+<!DOCTYPE html> 
+<html>
+    <body>
+        <form action="{% url 'dishIDapp:mainPage' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" id="photo" name="photo" accept="image/*" onchange="loadImg(event)">
+            <p><img id="image" width="200"/></p>
+            <script>
+                var loadImg = function (event) {
+                    var image = document.getElementById('image');
+                    image.src = URL.createObjectURL(event.target.files[0]);            
+                };
+            </script>
+        </form>     
+    </body>
+</html>
