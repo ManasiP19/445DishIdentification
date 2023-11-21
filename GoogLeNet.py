@@ -4,13 +4,14 @@ import tensorflow_cnn as tf
 from tensorflow.keras.preprocessing.image import img_to_array, array_to_img
 from tensorflow.keras.applications import InceptionV3
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
-from tensorflow.keras.models import Model
+from tensorflow.keras.models import Model, saved_model
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from PIL import Image
 from load_images import load_images_from_zip
 import zipfile
 from image_preprocessing import image_preprocessing
+import os
 
 df = load_images_from_zip('images.zip')
 df.head()
@@ -73,3 +74,6 @@ history = model.fit(
     validation_data=custom_data_generator(test_df, batch_size, img_size, preprocessing_params=preprocessing_params),
     validation_steps=len(test_df) // batch_size
 )
+
+# Save the trained model
+model.save('googlenet.h5')

@@ -31,8 +31,6 @@ def image_preprocessing(image, normalize_pixel_vals=None, flattening=None, new_d
     if new_dimensions:
         preprocessed_image = cv2.resize(preprocessed_image, (new_dimensions[0], new_dimensions[1]))
 
-    print(f"Image shape after resizing: {preprocessed_image.shape}")
-
     # perform image sharpening
     if sharpening:
         kernel_sharpening = np.array([[-1, -1, -1],
@@ -45,10 +43,8 @@ def image_preprocessing(image, normalize_pixel_vals=None, flattening=None, new_d
         preprocessed_image = cv2.resize(preprocessed_image, None, fx=resize_factor, fy=resize_factor)
 
     # convert image to greyscale if it has more than one channel
-    if to_greyscale and preprocessed_image.ndim == 3 and preprocessed_image.shape[-1] > 1:
-        preprocessed_image = cv2.cvtColor(preprocessed_image, cv2.COLOR_BGR2GRAY)
-
-    print(f"Image shape after conversion to greyscale: {preprocessed_image.shape}")
+    # if to_greyscale and preprocessed_image.ndim == 3 and preprocessed_image.shape[-1] > 1:
+    #     preprocessed_image = cv2.cvtColor(preprocessed_image, cv2.COLOR_BGR2GRAY)
 
     # do other things? such as ZCA whitening / PCA
 

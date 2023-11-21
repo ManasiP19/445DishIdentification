@@ -7,6 +7,8 @@ from sklearn.model_selection import train_test_split
 from PIL import Image
 import zipfile
 from image_preprocessing import image_preprocessing
+import os
+from tensorflow.keras.models import saved_model
 
 # Load image data
 dataset_path = 'images.zip'
@@ -82,3 +84,6 @@ history = model.fit(
     validation_data=custom_data_generator(test_df, batch_size, img_size, preprocessing_params={'img_size': img_size}),
     validation_steps=len(test_df) // batch_size
 )
+
+# Save the trained model
+model.save('tensorflow_cnn.h5')
