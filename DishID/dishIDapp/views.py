@@ -6,7 +6,7 @@ import requests
 from tensorflow.keras.models import load_model
 
 # Load the saved model
-saved_model_path = 'path/to/your/saved_model.h5'
+saved_model_path = '../../saved_model.h5'
 loaded_model = load_model(saved_model_path)
 
 # Create your views here.

@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
-import tensorflow_cnn as tf
-from tensorflow.keras.preprocessing.image import img_to_array, array_to_img
+from sklearn.base import accuracy_score
+from sklearn.metrics import classification_report
+import tensorflow as tf
+from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.applications import InceptionV3
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
-from tensorflow.keras.models import Model, saved_model
+from tensorflow.keras.models import Model, load_model
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from PIL import Image
@@ -13,15 +15,17 @@ import zipfile
 from image_preprocessing import image_preprocessing
 import os
 
+# Load images and labels
 df = load_images_from_zip('images.zip')
 df.head()
 
+# Encode labels
 label_encoder = LabelEncoder()
 df['labels_encoded'] = label_encoder.fit_transform(df['labels'])
 num_classes = len(label_encoder.classes_)
 
+# Split the dataset into training and testing sets
 train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
-
 
 def custom_data_generator(dataframe, batch_size, img_size, preprocessing_params=None):
     while True:
@@ -44,7 +48,7 @@ def custom_data_generator(dataframe, batch_size, img_size, preprocessing_params=
 
 img_size = (299, 299)
 batch_size = 32
-epochs = 10
+epochs = 5
 
 # Example usage of custom_data_generator with preprocessing
 preprocessing_params = {
@@ -56,17 +60,16 @@ preprocessing_params = {
     'to_greyscale': True
 }
 
+# Build the model
 base_model = InceptionV3(weights='imagenet', include_top=False)
-
 x = base_model.output
 x = GlobalAveragePooling2D()(x)
 x = Dense(1024, activation='relu')(x)
 predictions = Dense(num_classes, activation='softmax')(x)
-
 model = Model(inputs=base_model.input, outputs=predictions)
-
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
+# Train the model
 history = model.fit(
     custom_data_generator(train_df, batch_size, img_size, preprocessing_params=preprocessing_params),
     steps_per_epoch=len(train_df) // batch_size,
@@ -77,3 +80,23 @@ history = model.fit(
 
 # Save the trained model
 model.save('googlenet.h5')
+
+# Load the saved model for testing
+loaded_model = load_model('googlenet.h5')
+
+# Evaluate the model on the test set
+test_generator = custom_data_generator(test_df, batch_size, img_size, preprocessing_params=preprocessing_params)
+test_steps = len(test_df) // batch_size
+test_predictions = loaded_model.predict(test_generator, steps=test_steps)
+
+# Convert predictions to class labels
+predicted_labels = np.argmax(test_predictions, axis=1)
+true_labels = np.concatenate([np.argmax(y_true, axis=1) for _, y_true in test_generator], axis=0)
+
+# Calculate accuracy, precision, and recall
+accuracy = accuracy_score(true_labels, predicted_labels)
+report = classification_report(true_labels, predicted_labels, target_names=label_encoder.classes_)
+
+# Print or log the results
+print("Test Accuracy:", accuracy)
+print("Classification Report:\n", report)
