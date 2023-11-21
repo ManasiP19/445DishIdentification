@@ -17,11 +17,17 @@
 
        <div> 
         {% if apiResponse %}
-            <h2>Recipe Information</h2>
+            <h2>Suggested Recipe</h2>
             <p><strong>Title: </strong>{{ apiResponse.0.title }}</p>
             <p><strong>Ingredients: </strong>{{ apiResponse.0.ingredients }}</p>
             <p><strong>Servings: </strong>{{ apiResponse.0.servings }}</p>
             <p><strong>Instructions: </strong>{{ apiResponse.0.instructions }}</p>
+
+            <h2>Suggested Recipe</h2>
+            <p><strong>Title: </strong>{{ apiResponse.1.title }}</p>
+            <p><strong>Ingredients: </strong>{{ apiResponse.1.ingredients }}</p>
+            <p><strong>Servings: </strong>{{ apiResponse.1.servings }}</p>
+            <p><strong>Instructions: </strong>{{ apiResponse.1.instructions }}</p>
         {% else %}
             <p>No recipe information available.</p>
         {% endif %}
