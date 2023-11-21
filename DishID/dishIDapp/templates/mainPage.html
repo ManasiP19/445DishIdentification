@@ -1,6 +1,11 @@
 <!DOCTYPE html> 
 <html>
+    <head> 
+        <link rel="stylesheet" href="static/pretty.css">
+    </head>
     <body>
+
+        <h1>Dish Identification</h1>
        <form method="post" enctype="multipart/form-data">
         {% csrf_token %}  {{ form.as_p }}
         <button type="submit">Upload</button>
