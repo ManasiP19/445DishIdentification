@@ -4,7 +4,7 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score
 from skimage.feature import hog
 from skimage import exposure
 from load_images import load_images_from_zip
@@ -68,5 +68,10 @@ svm_predictions = svm_model.predict(test_features_std)
 accuracy = accuracy_score(test_labels, svm_predictions)
 print(f'SVM Accuracy: {accuracy}')
 
+precision = precision_score(test_labels, svm_predictions, average = 'weighted')
+print(f'SVM Precision: {precision}')
+
+recall = recall_score(test_labels, svm_predictions, average = 'weighted')
+print(f'SVM Recall: {recall}')
 # Assuming svm_model is your trained SVM model
 joblib.dump(svm_model, 'svm_model.joblib')
