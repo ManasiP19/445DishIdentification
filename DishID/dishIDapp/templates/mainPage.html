@@ -1,16 +1,26 @@
 <!DOCTYPE html> 
 <html>
     <body>
-        <form action="{% url 'dishIDapp:mainPage' %}" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="file" id="photo" name="photo" accept="image/*" onchange="loadImg(event)">
-            <p><img id="image" width="200"/></p>
-            <script>
-                var loadImg = function (event) {
-                    var image = document.getElementById('image');
-                    image.src = URL.createObjectURL(event.target.files[0]);            
-                };
-            </script>
-        </form>     
+       <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}  {{ form.as_p }}
+        <button type="submit">Upload</button>
+       </form>  
+       {% if img_obj %}
+       <h3>This dish is: {{img_obj.title}}</h3> 
+       <img src="{{ img_obj.image.url}}" alt="connect" style="max-height: 300px;">
+       {% endif %}
+
+       <div> 
+        {% if apiResponse %}
+            <h2>Recipe Information</h2>
+            <p><strong>Title: </strong>{{ apiResponse.0.title }}</p>
+            <p><strong>Ingredients: </strong>{{ apiResponse.0.ingredients }}</p>
+            <p><strong>Servings: </strong>{{ apiResponse.0.servings }}</p>
+            <p><strong>Instructions: </strong>{{ apiResponse.0.instructions }}</p>
+        {% else %}
+            <p>No recipe information available.</p>
+        {% endif %}
+       </div>
+       <!-- <p>{{ apiResponse }}</p> -->
     </body>
 </html>
