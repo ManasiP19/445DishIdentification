@@ -10,6 +10,8 @@ from skimage import exposure
 from load_images import load_images_from_zip
 import zipfile
 from image_preprocessing import image_preprocessing
+import joblib
+
 
 def preprocess_and_extract_hog(img):
     img = image_preprocessing(img, normalize_pixel_vals=True, to_greyscale=True)
@@ -65,3 +67,6 @@ svm_predictions = svm_model.predict(test_features_std)
 # Evaluate the SVM model
 accuracy = accuracy_score(test_labels, svm_predictions)
 print(f'SVM Accuracy: {accuracy}')
+
+# Assuming svm_model is your trained SVM model
+joblib.dump(svm_model, 'svm_model.joblib')
