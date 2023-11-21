@@ -1,0 +1,31 @@
+body {
+    background-color: #fffee6;
+}
+
+h1 {
+    color: #291211;
+    text-align: center; 
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+form {
+    color: #252827;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+ 
+button {
+    padding: 15px 25px;
+    cursor: pointer; 
+    border: none;
+    border-radius: 15px;
+    color: #ffffff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    background-color: #f8cf2c;
+    box-shadow: #291211 0 4px;
+}
+
+button:active {
+    box-shadow: 0 3px #252827;
+    transform: translateY(3px);
+
+}

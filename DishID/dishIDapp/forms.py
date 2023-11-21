@@ -1,12 +1,8 @@
-from django.db import models
-from django.form import fields
-from .models import Image
 from django import forms
+from .models import Image
 
-
-class userImage(forms.ModelForm):
-    class meta: 
-        models = Image
-        fields = '__all__'
-
-        
+class ImageForm(forms.ModelForm):
+    # Form for the image model 
+    class Meta: 
+        model = Image
+        fields = ('title', 'image')
