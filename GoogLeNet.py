@@ -9,11 +9,11 @@ from tensorflow.keras.models import Model
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from PIL import Image
-from load_images import load_images_from_zip
+from load_images import load_images
 import zipfile
 
 # Load images and labels
-df = load_images_from_zip('images.zip')
+df = load_images('images')
 
 # Encode labels
 label_encoder = LabelEncoder()
@@ -30,14 +30,12 @@ def custom_data_generator(dataframe, batch_size, img_size):
             batch_images = []
             batch_labels = []
             for _, row in batch_df.iterrows():
-                with zipfile.ZipFile('images.zip', 'r') as zip_ref:
-                    with zip_ref.open(row['image_path']) as file:
-                        img = Image.open(file)
-                        img = img.resize(img_size)
-                        img_array = img_to_array(img)
-                        img_array /= 255.0
-                        batch_images.append(img_array)
-                        batch_labels.append(label_encoder.transform([row['labels']])[0])
+                img = Image.open(row['image_path'])
+                img = img.resize(img_size)
+                img_array = img_to_array(img)
+                img_array /= 255.0
+                batch_images.append(img_array)
+                batch_labels.append(label_encoder.transform([row['labels']])[0])
             batch_labels = tf.keras.utils.to_categorical(batch_labels, num_classes=num_classes)
             yield np.array(batch_images), np.array(batch_labels)
 

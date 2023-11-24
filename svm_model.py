@@ -1,4 +1,3 @@
-import os
 import numpy as np
 from PIL import Image
 from sklearn.model_selection import train_test_split
@@ -7,8 +6,7 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from skimage.feature import hog
 from skimage import exposure
-from load_images import load_images_from_zip
-import zipfile
+from load_images import load_images
 from image_preprocessing import image_preprocessing
 import joblib
 
@@ -20,23 +18,20 @@ def preprocess_and_extract_hog(img):
     hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
     return fd
 
-def extract_features_and_labels(dataframe, zip_file):
+def extract_features_and_labels(dataframe):
     features = []
     labels = []
 
-    for index, row in dataframe.iterrows():
-        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-            with zip_ref.open(row['image_path']) as file:
-                img = Image.open(file)
-                hog_features = preprocess_and_extract_hog(img)
-                features.append(hog_features)
-                labels.append(row['labels_encoded'])
+    for _, row in dataframe.iterrows():
+        img = Image.open(row['image_path'])
+        hog_features = preprocess_and_extract_hog(img)
+        features.append(hog_features)
+        labels.append(row['labels_encoded'])
 
     return np.array(features), np.array(labels)
 
 # Load images and labels
-dataset_path = 'images.zip'
-df = load_images_from_zip(dataset_path)
+df = load_images('images')
 
 # Encode labels
 label_encoder = LabelEncoder()

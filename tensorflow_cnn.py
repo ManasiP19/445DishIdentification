@@ -1,5 +1,5 @@
 from sklearn.metrics import classification_report, precision_score, recall_score
-from load_images import load_images_from_zip
+from load_images import load_images
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, img_to_array
@@ -9,8 +9,7 @@ from PIL import Image
 import zipfile
 
 # Load image data
-dataset_path = 'images.zip'
-df = load_images_from_zip(dataset_path)
+df = load_images('images')
 
 # Encode labels
 label_encoder = LabelEncoder()
@@ -32,14 +31,12 @@ def custom_data_generator(dataframe, batch_size, img_size):
             batch_df = dataframe.iloc[i:i+batch_size]
             batch_images = []
             batch_labels = []
-            for index, row in batch_df.iterrows():
-                with zipfile.ZipFile('images.zip', 'r') as zip_ref:
-                    with zip_ref.open(row['image_path']) as file:
-                        img = Image.open(file)
-                        img = img.resize(img_size)
-                        img_array = img_to_array(img)
-                        batch_images.append(img_array)
-                        batch_labels.append(label_encoder.transform([row['labels']])[0])
+            for _, row in batch_df.iterrows():
+                img = Image.open(row['image_path'])
+                img = img.resize(img_size)
+                img_array = img_to_array(img)
+                batch_images.append(img_array)
+                batch_labels.append(label_encoder.transform([row['labels']])[0])
             
             # Apply data augmentation and normalization
             batch_images = datagen.flow(np.array(batch_images), shuffle=False, batch_size=batch_size).next()
