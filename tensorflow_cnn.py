@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from PIL import Image
 import zipfile
+from confusion_matrix import tensorFlow_confusion_matrix
 
 # Load image data
 df = load_images('images')
@@ -100,3 +101,6 @@ print(classification_report_str)
 
 # Save the trained model
 model.save('tensorflow_cnn.h5')
+
+#call the confusion matrix
+tensorFlow_confusion_matrix(test_df, batch_size, img_size, label_encoder)
