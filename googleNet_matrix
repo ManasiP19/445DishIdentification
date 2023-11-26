@@ -1,0 +1,76 @@
+# confusion_matrix.py
+
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+from tensorflow.keras.models import load_model
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from PIL import Image
+from tensorflow.keras.preprocessing.image import img_to_array
+import zipfile
+from load_images import load_imagesp
+
+df = load_imagesp('images')
+df.head()
+train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
+
+def custom_data_generator(dataframe, batch_size, img_size, label_encoder, preprocessing_params=None):
+    while True:
+        for i in range(0, len(dataframe), batch_size):
+            batch_df = dataframe.iloc[i:i + batch_size]
+            batch_images = []
+            batch_labels = []
+            for index, row in batch_df.iterrows():
+                with zipfile.ZipFile('images.zip', 'r') as zip_ref:
+                    with zip_ref.open(row['image_path']) as file:
+                        img = Image.open(file)
+                        img = img.resize(img_size)
+                        img_array = img_to_array(img)
+                        img_array /= 255.0
+                        batch_images.append(img_array)
+                        batch_labels.append(label_encoder.transform([row['labels']])[0])
+            batch_labels = np.array(batch_labels)
+            yield np.array(batch_images), batch_labels
+
+def generate_confusion_matrix(model_path, test_df, batch_size, img_size, label_encoder):
+    # Load the saved model
+    loaded_model = load_model(model_path)
+
+    # Generate predictions on the test set
+    test_generator = custom_data_generator(test_df, batch_size, img_size, label_encoder)
+    test_steps = len(test_df) // batch_size
+    test_predictions = loaded_model.predict(test_generator, steps=test_steps)
+
+    # Convert predictions to class labels
+    predicted_labels = np.argmax(test_predictions, axis=1)
+    true_labels = np.concatenate([y_true for _, y_true in test_generator], axis=0)
+
+    # Compute confusion matrix
+    cm = confusion_matrix(true_labels, predicted_labels)
+
+    # Visualize confusion matrix
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=label_encoder.classes_, yticklabels=label_encoder.classes_)
+    plt.title('Confusion Matrix')
+    plt.xlabel('Predicted Labels')
+    plt.ylabel('True Labels')
+    plt.show()
+
+if __name__ == "__main__":
+    # Replace these paths and values with your actual paths and values
+    model_path = 'googlenet.h5'
+    test_csv_path = 'test.csv'
+    batch_size = 32
+    img_size = (299, 299)
+
+    # Load labels for encoding and decoding
+    label_encoder = LabelEncoder()
+    label_encoder.classes_ = np.load('label_encoder_classes.npy')
+
+    # Load test data
+    #test_df = pd.read_csv(test_csv_path)
+
+    # Generate and visualize confusion matrix
+    generate_confusion_matrix(model_path, test_df, batch_size, img_size, label_encoder)
