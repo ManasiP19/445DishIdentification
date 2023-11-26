@@ -1,0 +1,31 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Assuming you have these defined already
+epochs = 10
+batch_size = 32
+
+# Lists to store training metrics
+training_accuracy = [0.0462, 0.1163, 0.1688, 0.2102, 0.2385, 0.2647, 0.2847, 0.3052, 0.3205, 0.3348]
+validation_accuracy = [0.0867, 0.1513, 0.1876, 0.2049, 0.2142, 0.2390, 0.2397, 0.2543, 0.2522, 0.2629]
+training_loss = [4.3660, 3.8691, 3.5573, 3.3392, 3.1824, 3.0525, 2.9453, 2.8543, 2.7696, 2.6992]
+validation_loss = [4.0700, 3.6835, 3.4763, 3.3619, 3.3093, 3.2117, 3.1973, 3.1541, 3.1326, 3.1323]
+
+# Plotting
+epochs_range = range(1, epochs + 1)
+
+plt.figure(figsize=(12, 4))
+
+plt.subplot(1, 2, 1)
+plt.plot(epochs_range, training_accuracy, label='Training Accuracy')
+plt.plot(epochs_range, validation_accuracy, label='Validation Accuracy')
+plt.legend(loc='lower right')
+plt.title('Training and Validation Accuracy')
+
+plt.subplot(1, 2, 2)
+plt.plot(epochs_range, training_loss, label='Training Loss')
+plt.plot(epochs_range, validation_loss, label='Validation Loss')
+plt.legend(loc='upper right')
+plt.title('Training and Validation Loss')
+
+plt.show()
