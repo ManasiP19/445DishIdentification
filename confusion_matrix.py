@@ -1,41 +1,42 @@
-from sklearn.metrics import confusion_matrix
-import seaborn as sns
-import matplotlib.pyplot as plt
+import pandas as pd
 
-# Assuming 'test_df' is your test DataFrame
-# Assuming 'model' is your GoogleNet model
-# Assuming 'model_tf_cnn' is your TensorFlow CNN model
+# Read CSV files for each model
+df_model1 = pd.read_csv('tensorflow_info.csv')
+df_model2 = pd.read_csv('googlenet_info.csv')
 
-# GoogleNet model evaluation
-test_generator_googleNet = custom_data_generator(test_df, batch_size, img_size)
-test_steps_googleNet = len(test_df) // batch_size
-test_predictions_googleNet = model.predict(test_generator_googleNet, steps=test_steps_googleNet)
+# Extract precision, recall, f1-score, and support for each model
+name1 = df_model1['name'].values[0]
+precision_model1 = df_model1['precision'].values[0]
+recall_model1 = df_model1['recall'].values[0]
+f1_score_model1 = df_model1['f1-score'].values[0]
+support_model1 = df_model1['support'].values[0]
 
-predicted_labels_googleNet = np.argmax(test_predictions_googleNet, axis=1)
-true_labels_googleNet = np.concatenate([np.argmax(y_true, axis=1) for _, y_true in test_generator_googleNet], axis=0)
+name2 = df_model2['name'].values[0]
+precision_model2 = df_model2['precision'].values[0]
+recall_model2 = df_model2['recall'].values[0]
+f1_score_model2 = df_model2['f1-score'].values[0]
+support_model2 = df_model2['support'].values[0]
 
-# TensorFlow CNN model evaluation
-test_generator_tf_cnn = custom_data_generator(test_df, batch_size, img_size)
-test_steps_tf_cnn = len(test_df) // batch_size
-test_predictions_tf_cnn = model_tf_cnn.predict(test_generator_tf_cnn, steps=test_steps_tf_cnn)
+total_instances = support_model1 + support_model2
 
-predicted_labels_tf_cnn = np.argmax(test_predictions_tf_cnn, axis=1)
-true_labels_tf_cnn = np.concatenate([np.argmax(y_true, axis=1) for _, y_true in test_generator_tf_cnn], axis=0)
+# Function to generate confusion matrix
+def generate_confusion_matrix(precision, recall, f1_score, support):
+    tp = precision * support
+    fn = support - tp
+    fp = tp / precision - tp
+    tn = total_instances - (tp + fp + fn)
 
-# Plot confusion matrix for GoogleNet
-cm_googleNet = confusion_matrix(true_labels_googleNet, predicted_labels_googleNet)
-plt.figure(figsize=(8, 6))
-sns.heatmap(cm_googleNet, annot=True, fmt='d', cmap='Blues', xticklabels=label_encoder.classes_, yticklabels=label_encoder.classes_)
-plt.title('Confusion Matrix - GoogleNet')
-plt.xlabel('Predicted Labels')
-plt.ylabel('True Labels')
-plt.show()
+    confusion_matrix = [[int(tn), int(fp)],
+                        [int(fn), int(tp)]]
+    
+    return confusion_matrix
 
-# Plot confusion matrix for TensorFlow CNN
-cm_tf_cnn = confusion_matrix(true_labels_tf_cnn, predicted_labels_tf_cnn)
-plt.figure(figsize=(8, 6))
-sns.heatmap(cm_tf_cnn, annot=True, fmt='d', cmap='Blues', xticklabels=label_encoder.classes_, yticklabels=label_encoder.classes_)
-plt.title('Confusion Matrix - TensorFlow CNN')
-plt.xlabel('Predicted Labels')
-plt.ylabel('True Labels')
-plt.show()
+# Generate confusion matrix for each model
+confusion_matrix_model1 = generate_confusion_matrix(precision_model1, recall_model1, f1_score_model1, support_model1)
+confusion_matrix_model2 = generate_confusion_matrix(precision_model2, recall_model2, f1_score_model2, support_model2)
+
+print("Confusion Matrix for Model 1:")
+print(confusion_matrix_model1)
+
+print("\nConfusion Matrix for Model 2:")
+print(confusion_matrix_model2)
