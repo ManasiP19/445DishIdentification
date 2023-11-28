@@ -6,8 +6,6 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator, img_to_arra
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from PIL import Image
-import zipfile
-from confusion_matrix import tensorFlow_confusion_matrix
 
 # Load image data
 df = load_images('images')
@@ -20,7 +18,7 @@ num_classes = len(label_encoder.classes_)
 # Split data into training and testing sets
 train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
 
-def custom_data_generator(dataframe, batch_size, img_size):
+def custom_data_generator(dataframe, batch_size, img_size, shuffle=True):
     datagen = ImageDataGenerator(
         rescale=1./255,
         shear_range=0.2,
@@ -28,6 +26,9 @@ def custom_data_generator(dataframe, batch_size, img_size):
         horizontal_flip=True
     )
     while True:
+        if shuffle:
+            dataframe = dataframe.sample(frac=1).reset_index(drop=True)  # Shuffle the data
+
         for i in range(0, len(dataframe), batch_size):
             batch_df = dataframe.iloc[i:i+batch_size]
             batch_images = []
@@ -36,6 +37,8 @@ def custom_data_generator(dataframe, batch_size, img_size):
                 img = Image.open(row['image_path'])
                 img = img.resize(img_size)
                 img_array = img_to_array(img)
+                if img_array.shape[-1] == 1:
+                    img_array = np.concatenate([img_array] * 3, axis=-1)
                 batch_images.append(img_array)
                 batch_labels.append(label_encoder.transform([row['labels']])[0])
             
@@ -71,14 +74,19 @@ history = model.fit(
     validation_steps=len(test_df) // batch_size
 )
 
+# Save the trained model
+model.save('tensorflow_cnn.keras')
+
 # Generate predictions on the test set
-test_generator = custom_data_generator(test_df, batch_size, img_size, preprocessing_params={'img_size': img_size})
+test_generator = custom_data_generator(test_df, batch_size, img_size, shuffle=False)
 test_steps = len(test_df) // batch_size
 test_results = model.evaluate(test_generator, steps=test_steps)
 
 # Print or log the test accuracy
 test_accuracy = test_results[1]
 print("Test Accuracy:", test_accuracy)
+
+test_generator = custom_data_generator(test_df, batch_size, img_size, shuffle=False)
 
 predictions = model.predict(test_generator, steps=test_steps)
 
@@ -98,9 +106,3 @@ print("Recall:", recall)
 classification_report_str = classification_report(true_labels, predicted_labels, target_names=label_encoder.classes_)
 print("Classification Report:")
 print(classification_report_str)
-
-# Save the trained model
-model.save('tensorflow_cnn.h5')
-
-#call the confusion matrix
-tensorFlow_confusion_matrix(test_df, batch_size, img_size, label_encoder)
