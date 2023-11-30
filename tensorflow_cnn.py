@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from PIL import Image
 import zipfile
+import matplotlib.pyplot as plt
 from confusion_matrix import tensorFlow_confusion_matrix
 
 # Load image data
@@ -70,6 +71,33 @@ history = model.fit(
     validation_data=custom_data_generator(test_df, batch_size, img_size),
     validation_steps=len(test_df) // batch_size
 )
+# Save the training history for plotting
+training_loss = history.history['loss']
+training_accuracy = history.history['accuracy']
+validation_loss = history.history['val_loss']
+validation_accuracy = history.history['val_accuracy']
+
+# Plot training and validation loss
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1)
+plt.plot(training_loss, label='Training Loss')
+plt.plot(validation_loss, label='Validation Loss')
+plt.title('Training and Validation Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+
+# Plot training and validation accuracy
+plt.subplot(1, 2, 2)
+plt.plot(training_accuracy, label='Training Accuracy')
+plt.plot(validation_accuracy, label='Validation Accuracy')
+plt.title('Training and Validation Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+
+plt.tight_layout()
+plt.show()
 
 # Generate predictions on the test set
 test_generator = custom_data_generator(test_df, batch_size, img_size, preprocessing_params={'img_size': img_size})
