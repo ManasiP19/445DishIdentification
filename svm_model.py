@@ -7,12 +7,10 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from skimage.feature import hog
 from skimage import exposure
 from load_images import load_images
-from image_preprocessing import image_preprocessing
 import joblib
 
 
 def preprocess_and_extract_hog(img):
-    img = image_preprocessing(img, normalize_pixel_vals=True, to_greyscale=True)
     img = img.resize((64, 64))  # Resize for consistency
     fd, hog_image = hog(np.array(img), orientations=8, pixels_per_cell=(4, 4), cells_per_block=(1, 1), visualize=True)
     hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
