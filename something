@@ -1,0 +1,128 @@
+import pandas as pd
+from io import StringIO
+
+# Your classification report as a string
+classification_report_str = """
+              name           precision    recall  f1-score   support
+              Applepie       0.09      0.11      0.10       205
+         Babybacribs       0.34      0.21      0.26       188
+                Baklava       0.26      0.17      0.20       212
+         Beefcarpaccio       0.35      0.46      0.40       201
+           Beeftartare       0.20      0.14      0.16       186
+             Beetsalad       0.28      0.22      0.25       183
+               Beignets       0.54      0.35      0.43       218
+               Bibimbap       0.31      0.50      0.38       196
+          Breadpudding       0.17      0.08      0.11       217
+      Breakfastburrito       0.07      0.02      0.03       194
+             Bruschetta       0.35      0.15      0.21       194
+           Caesarsalad       0.27      0.52      0.35       214
+                Cannoli       0.17      0.35      0.23       214
+          Capresesalad       0.21      0.43      0.28       202
+            Carrotcake       0.21      0.27      0.24       191
+                Ceviche       0.16      0.12      0.14       199
+           Cheeseplate       0.09      0.20      0.13       192
+             Cheesecake       0.29      0.18      0.22       198
+          Chickencurry       0.24      0.14      0.18       199
+     Chickenquesadilla       0.15      0.22      0.18       203
+          Chickenwings       0.41      0.16      0.23       211
+         Chocolatecake       0.39      0.36      0.37       218
+       Chocolatemousse       0.13      0.21      0.16       190
+                Churros       0.18      0.15      0.16       217
+           Clamchowder       0.37      0.41      0.39       197
+          Clubsandwich       0.15      0.12      0.14       170
+             Crabcakes       0.14      0.11      0.12       202
+           Cremebrulee       0.33      0.14      0.19       195
+          Croquemadame       0.25      0.44      0.32       192
+              Cupcakes       0.23      0.14      0.18       214
+           Deviledeggs       0.15      0.14      0.15       209
+                 Donuts       0.28      0.07      0.11       186
+              Dumplings       0.45      0.57      0.51       214
+                Edamame       0.62      0.84      0.72       215
+          Eggsbenedict       0.30      0.18      0.22       213
+              Escargots       0.16      0.23      0.19       183
+                Falafel       0.13      0.06      0.09       192
+           Filetmignon       0.22      0.16      0.18       199
+         Fishandchips       0.22      0.26      0.24       209
+              Foiegras       0.19      0.11      0.14       188
+           Frenchfries       0.29      0.46      0.35       203
+      Frenchonionsoup       0.42      0.27      0.33       219
+           Frenchtoast       0.32      0.04      0.06       197
+         Friedcalamari       0.17      0.13      0.15       228
+             Friedrice       0.24      0.31      0.27       189
+          Frozenyogurt       0.31      0.41      0.35       218
+           Garlicbread       0.33      0.28      0.31       204
+                Gnocchi       0.22      0.12      0.16       212
+            Greeksalad       0.28      0.35      0.32       198
+Grilledcheesesandwich       0.16      0.08      0.11       221
+         Grilledsalmon       0.16      0.14      0.15       210
+              Guacamole       0.29      0.34      0.31       210
+                  Gyoza       0.17      0.06      0.08       200
+              Hamburger       0.19      0.19      0.19       216
+      Hotandsoursoup       0.50      0.52      0.51       202
+                Hotdog       0.21      0.21      0.21       177
+       Huevosrancheros       0.17      0.08      0.11       196
+                 Hummus       0.09      0.05      0.06       192
+              Icecream       0.13      0.20      0.16       201
+                Lasagna       0.24      0.18      0.21       180
+         Lobsterbisque       0.44      0.41      0.42       199
+  Lobsterrollsandwich       0.34      0.21      0.26       175
+    Macaroniandcheese       0.36      0.17      0.23       204
+               Macarons       0.17      0.30      0.22       198
+              Misosoup       0.42      0.62      0.50       213
+                Mussels       0.48      0.54      0.51       217
+                 Nachos       0.20      0.10      0.14       191
+               Omelette       0.12      0.03      0.04       194
+            Onionrings       0.25      0.22      0.23       198
+                Oysters       0.29      0.61      0.39       209
+               Padthai       0.32      0.39      0.35       198
+                 Paella       0.31      0.24      0.27       205
+               Pancakes       0.33      0.30      0.31       203
+            Pannacotta       0.22      0.20      0.21       203
+            Pekingduck       0.18      0.19      0.19       183
+                    Pho       0.46      0.63      0.53       208
+                  Pizza       0.35      0.37      0.36       202
+              Porkchop       0.16      0.24      0.19       211
+                Poutine       0.28      0.36      0.32       191
+              Primerib       0.24      0.34      0.28       209
+   Pulledporksandwich       0.20      0.15      0.17       197
+                  Ramen       0.47      0.29      0.36       231
+                Ravioli       0.17      0.18      0.17       194
+        Redvelvetcake       0.40      0.54      0.46       183
+                Risotto       0.30      0.10      0.15       197
+                 Samosa       0.16      0.18      0.17       170
+                Sashimi       0.25      0.47      0.32       188
+               Scallops       0.12      0.13      0.12       182
+          Seaweedsalad       0.54      0.66      0.59       206
+       Shrimpandgrits       0.30      0.17      0.22       207
+    Spaghettibolognese       0.37      0.42      0.39       197
+    Spaghetticarbonara       0.38      0.46      0.42       205
+           Springrolls       0.12      0.17      0.14       195
+                  Steak       0.16      0.17      0.17       193
+   Strawberryshortcake       0.23      0.43      0.30       185
+                  Sushi       0.17      0.20      0.18       199
+                  Tacos       0.15      0.06      0.08       193
+               Takoyaki       0.14      0.27      0.19       199
+               Tiramisu       0.22      0.32      0.26       188
+           Tunatartare       0.23      0.13      0.16       196
+                Waffles       0.17      0.06      0.09       191
+
+"""
+
+# Replace extra whitespaces with a single space to ensure consistent separation
+classification_report_str = ' '.join(classification_report_str.split())
+
+# Split the classification report into lines
+lines = classification_report_str.split('\n')
+
+# Extract the header and data
+header = lines[0].split()
+data = [line.split() for line in lines[2:]]
+
+# Create a DataFrame
+classification_data = pd.DataFrame(data, columns=header)
+
+# Save the DataFrame to a CSV file
+classification_data.to_csv('tensorflow_info.csv', index=False)
+
+
+
