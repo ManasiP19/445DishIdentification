@@ -1,3 +1,7 @@
 images.zip
 __pycache__
 venv/
+env/
+virtual/
+DishID/dishIDapp/savedModels/googlenet.keras
+
